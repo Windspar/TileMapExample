@@ -5,6 +5,7 @@ So far this is an example. Show how to handle huge maps. Like 1000 by 1000 and l
 #### TODO ####
 * MapBuilder is still under construction.
 * Will be added an object/foreground layer.
+* Collision still needs to be improve.
 * Improve code.
 
 ## Requirements ##
