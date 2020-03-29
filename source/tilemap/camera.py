@@ -48,14 +48,17 @@ class TileCamera:
 
     def collision(self, position):
         tilesize = self.tilemap.tilesize
-        # old_position = self.tileplayer.get_map_position(self.position)
-        # new_position = self.tileplayer.get_map_position(position)
+        old_position = self.tileplayer.get_map_position(self.position)
+        new_position = self.tileplayer.get_map_position(position)
 
         for point in self.tileplayer.get_collsion_locations(position, tilesize):
             if self.tilemap[point].object_key in self.tilemap.tile_collision:
-                return
+                center = (Vector2(point) * tilesize).elementwise() + tilesize / 2
+                if(new_position.distance_to(center) < old_position.distance_to(center)):
+                    return True
 
         self.position = position
+        return False
 
     def draw(self, surface, callback):
         for tile, position in self.tilemap.get_visable_tiles(self.position):
@@ -65,7 +68,17 @@ class TileCamera:
 
     def move(self, direction, delta):
         position = self.position + direction * self.speed * delta * self.speed_boost
-        self.collision(position)
+        if self.collision(position):
+            # Slide
+            dir = Vector2(direction)
+            if direction.x != 0 and direction.y != 0:
+                dir.x = 0
+                position = self.position + dir * self.speed * delta * self.speed_boost
+                if self.collision(position):
+                    dir.x = direction.x
+                    dir.y = 0
+                    position = self.position + dir * self.speed * delta * self.speed_boost
+                    self.collision(position)
 
         direction.x, direction.y = direction.y, direction.x
         angle = direction.as_polar()[1] - 90
